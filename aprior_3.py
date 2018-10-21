@@ -1,30 +1,15 @@
 import csv
-def load_data_set():
-    """
-    Load a sample data set (From Data Mining: Concepts and Techniques, 3th Edition)
-    Returns: 
-        A data set: A list of transactions. Each transaction contains several items.
-    """
-    
-    with open(r'C:\Users\ellen\IBM-Quest-Data-Generator.exe\dataset_ascii.ntrans_10.tlen_50.nitems_0.1.npats_100.csv', newline='') as csvfile:
+def load_data_set():    
+    with open(r'C:\Users\ellen\Desktop\WoW Demographics.csv', newline='') as csvfile:
 
-  # 讀取 CSV 檔案內容
       rows = csv.reader(csvfile)	
       data_set = []
-  # 以迴圈輸出每一列
       for row in rows:
           data_set.append (row)
     return data_set
 
 
 def create_C1(data_set):
-    """
-    Create frequent candidate 1-itemset C1 by scaning data set.
-    Args:
-        data_set: A list of transactions. Each transaction contains several items.
-    Returns:
-        C1: A set which contains all frequent candidate 1-itemsets
-    """
     C1 = set()
     for t in data_set:
         for item in t:
@@ -34,16 +19,6 @@ def create_C1(data_set):
 
 
 def is_apriori(Ck_item, Lksub1):
-    """
-    Judge whether a frequent candidate k-itemset satisfy Apriori property.
-    Args:
-        Ck_item: a frequent candidate k-itemset in Ck which contains all frequent
-                 candidate k-itemsets.
-        Lksub1: Lk-1, a set which contains all frequent candidate (k-1)-itemsets.
-    Returns:
-        True: satisfying Apriori property.
-        False: Not satisfying Apriori property.
-    """
     for item in Ck_item:
         sub_Ck = Ck_item - frozenset([item])
         if sub_Ck not in Lksub1:
@@ -52,15 +27,6 @@ def is_apriori(Ck_item, Lksub1):
 
 
 def create_Ck(Lksub1, k):
-    """
-    Create Ck, a set which contains all all frequent candidate k-itemsets
-    by Lk-1's own connection operation.
-    Args:
-        Lksub1: Lk-1, a set which contains all frequent candidate (k-1)-itemsets.
-        k: the item number of a frequent itemset.
-    Return:
-        Ck: a set which contains all all frequent candidate k-itemsets.
-    """
     Ck = set()
     len_Lksub1 = len(Lksub1)
     list_Lksub1 = list(Lksub1)
@@ -72,23 +38,12 @@ def create_Ck(Lksub1, k):
             l2.sort()
             if l1[0:k-2] == l2[0:k-2]:
                 Ck_item = list_Lksub1[i] | list_Lksub1[j]
-                # pruning
                 if is_apriori(Ck_item, Lksub1):
                     Ck.add(Ck_item)
     return Ck
 
 
 def generate_Lk_by_Ck(data_set, Ck, min_support, support_data):
-    """
-    Generate Lk by executing a delete policy from Ck.
-    Args:
-        data_set: A list of transactions. Each transaction contains several items.
-        Ck: A set which contains all all frequent candidate k-itemsets.
-        min_support: The minimum support.
-        support_data: A dictionary. The key is frequent itemset and the value is support.
-    Returns:
-        Lk: A set which contains all all frequent k-itemsets.
-    """
     Lk = set()
     item_count = {}
     for t in data_set:
@@ -107,16 +62,6 @@ def generate_Lk_by_Ck(data_set, Ck, min_support, support_data):
 
 
 def generate_L(data_set, k, min_support):
-    """
-    Generate all frequent itemsets.
-    Args:
-        data_set: A list of transactions. Each transaction contains several items.
-        k: Maximum number of items for all frequent itemsets.
-        min_support: The minimum support.
-    Returns:
-        L: The list of Lk.
-        support_data: A dictionary. The key is frequent itemset and the value is support.
-    """
     support_data = {}
     C1 = create_C1(data_set)
     L1 = generate_Lk_by_Ck(data_set, C1, min_support, support_data)
@@ -132,16 +77,6 @@ def generate_L(data_set, k, min_support):
 
 
 def generate_big_rules(L, support_data, min_conf):
-    """
-    Generate big rules from frequent itemsets.
-    Args:
-        L: The list of Lk.
-        support_data: A dictionary. The key is frequent itemset and the value is support.
-        min_conf: Minimal confidence.
-    Returns:
-        big_rule_list: A list which contains all big rules. Each big rule is represented
-                       as a 3-tuple.
-    """
     big_rule_list = []
     sub_set_list = []
     for i in range(0, len(L)):
@@ -158,9 +93,6 @@ def generate_big_rules(L, support_data, min_conf):
 
 
 if __name__ == "__main__":
-    """
-    Test
-    """
     data_set = load_data_set()
     L, support_data = generate_L(data_set, k=3, min_support=0.1)
     big_rules_list = generate_big_rules(L, support_data, min_conf=0.7)
@@ -174,3 +106,4 @@ if __name__ == "__main__":
     print ("Big Rules")
     for item in big_rules_list:
         print (item[0], "=>", item[1], "conf: ", item[2])
+
